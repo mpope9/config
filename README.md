@@ -2,7 +2,7 @@
 
 A Gleam configuration library.
 
-Relys on erlang's persistent_terms, so updating config values during runtime carries a heavy penalty (forces a GC on each process).
+Relys on erlang's [persistent_terms](https://erlang.org/doc/man/persistent_term.html), so updating config values during runtime carries a heavy penalty (forces a GC on each process).
 
 ## Installation
 

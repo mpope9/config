@@ -31,6 +31,8 @@
 
 %% Parse the config.  On failure, return a
 %% Gleam binary error message.
+-spec new() -> {error, binary()} | {ok, true}.
+
 new() ->
    ConfigFile = os:getenv(?ENV_FILE, ?DEFAULT_CONFIG),
    case toml:read_file(ConfigFile) of
@@ -49,13 +51,19 @@ new() ->
          {error, ErrorBinary}
    end.
 
+-spec get(binary()) -> term().
+
 get(Key) ->
    PersistentKey = {?MODULE, Key},
    persistent_term:get(PersistentKey).
 
+-spec get(binary(), term()) -> term().
+
 get(Key, Default) ->
    PersistentKey = {?MODULE, Key},
    persistent_term:get(PersistentKey, Default).
+
+-spec put(binary(), term()) -> term().
 
 put(Key, Value) ->
    gen_server:call(?MODULE, {put, Key, Value}).
@@ -64,8 +72,12 @@ put(Key, Value) ->
 %% gen_server api
 %% ----------------------------------
 
+-spec start_link() -> {ok, pid()}.
+
 start_link() ->
    gen_server:start_link({local, ?MODULE}, ?MODULE, ?MODULE, []).
+
+-spec init(term()) -> {ok, term()}.
 
 init(Opt) ->
    {ok, Opt}.
@@ -84,6 +96,8 @@ stop() ->
 %% ----------------------------------
 %% Internal Functions
 %% ----------------------------------
+-spec process_map(binary(), term(), binary()) -> binary().
+
 process_map(CurrentKey, Value, PartialKey) ->
 
    FullKey = <<PartialKey/binary, CurrentKey/binary>>,

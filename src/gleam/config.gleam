@@ -50,7 +50,7 @@ pub external fn start_link_config_server() -> tuple()
 pub external fn get_config_server(key: String) -> Dynamic 
   = "config_server" "get"
 pub external fn get_default_config_server(key: String, default) -> Dynamic 
-  = "config_server" "get_default"
+  = "config_server" "get"
 pub external fn put_config_server(key: String, value) -> Dynamic
   = "config_server" "put"
 pub external fn stop_config_server() -> Atom

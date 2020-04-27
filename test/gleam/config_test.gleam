@@ -25,6 +25,10 @@ pub fn new_config_test() {
   |> dynamic.bool
   |> expect.equal(_, Ok(False))
 
+  config.get_default("bad.key", False)
+  |> dynamic.bool
+  |> expect.equal(_, Ok(False))
+
   config.stop()
 }
 

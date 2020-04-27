@@ -1,6 +1,6 @@
 # config
 
-<a><img src="https://github.com/mpope9/config/workflows/CI/badge.svg?branch=master"></a>
+![test](https://github.com/mpope9/config/workflows/test/badge.svg)
 
 A Gleam configuration library.
 

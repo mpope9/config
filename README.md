@@ -4,6 +4,14 @@ A Gleam configuration library.
 
 Relys on erlang's persistent_terms, so updating config values during runtime carries a heavy penalty (forces a GC on each process).
 
+## Installation
+
+```erlang
+{deps, [
+    {config, {git, "https://github.com/mpope9/config"}}
+]}.
+```
+
 ## Example Usage
 This is powered by a gen_server, but configs are parsed and stored independently.  The gen_server is for safety and to optimize puts.
 
@@ -52,11 +60,3 @@ rebar3 eunit
 rebar3 shell
 ```
 
-
-## Installation
-
-```erlang
-{deps, [
-    {config, {git, "https://github.com/mpope9/config"}}
-]}.
-```

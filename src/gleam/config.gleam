@@ -87,13 +87,13 @@ pub fn get(key: String) -> Dynamic {
 ///
 /// Gets the specified key.  If it doesn't exist, returns the default value.
 ///
-pub fn get_default(key: String, value) {
+pub fn get_default(key: String, value) -> Dynamic {
   get_default_config_server(key, value)
 }
 
 ///
 /// Stores a new configuration value.  Use with caution.
 ///
-pub fn put(key: String, value) {
+pub fn put(key: String, value) -> Dynamic {
   put_config_server(key, value)
 }

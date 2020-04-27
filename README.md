@@ -1,8 +1,12 @@
 # config
 
+<a><img src="https://github.com/mpope9/config/workflows/CI/badge.svg?branch=master"></a>
+
 A Gleam configuration library.
 
 Relys on erlang's [persistent_terms](https://erlang.org/doc/man/persistent_term.html), so updating config values during runtime carries a heavy penalty (forces a GC on each process).
+
+Returns Dynamic types, as typing isn't known at the time of parsing the configuration files.
 
 ## Installation
 
@@ -15,12 +19,22 @@ Relys on erlang's [persistent_terms](https://erlang.org/doc/man/persistent_term.
 ## Example Usage
 This is powered by a gen_server, but configs are parsed and stored independently.  The gen_server is for safety and to optimize puts.
 
+Configuration:
+```toml
+[test1.test2]
+test3 = true
+```
+
+Usage:
 ```gleam
 import gleam/config
+import gleam/dynamic
 
 config.new()                    // Parses the config and stores it.
 config.start()                  // Starts the config server.
 config.get("test1.test2.test3") // Access.
+|> dynamic.bool
+|> expect.equal(_, Ok(True))
 ```
 
 ## Keys

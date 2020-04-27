@@ -1,0 +1,7 @@
+psum = "lorem ipsum dolor sit amet"
+
+[apples]
+count = 2
+
+[berry.black]
+has_some = true

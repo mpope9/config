@@ -1,0 +1,10 @@
+{"1.1.0",
+[{<<"gleam_stdlib">>,{pkg,<<"gleam_stdlib">>,<<"0.7.0">>},0},
+ {<<"toml-erlang">>,
+  {git,"https://github.com/filmor/toml-erlang",
+       {ref,"6e12d051353df43cf93467aface2cb01460d6679"}},
+  0}]}.
+[
+{pkg_hash,[
+ {<<"gleam_stdlib">>, <<"B641FCB5AD56CBD9CDB773C8547BEBA7CA16E85F31AAF9F3FE0F8AFD68AD0DF5">>}]}
+].

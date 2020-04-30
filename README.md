@@ -3,8 +3,8 @@
 ![test](https://github.com/mpope9/config/workflows/test/badge.svg)
 
 #### TOC
-[Installation](##installation)
-[Example Usage](##example-usage)
+* [Installation](#installation)
+* [Example Usage](#example-usage)
 
 A Gleam configuration library.
 

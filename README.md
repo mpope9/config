@@ -12,7 +12,7 @@
 
 A Gleam configuration library.
 
-Relys on erlang's [persistent_terms](https://erlang.org/doc/man/persistent_term.html), so updating config values during runtime carries a heavy penalty (forces a GC on each process).
+Relys on erlang's [persistent_terms](https://erlang.org/doc/man/persistent_term.html).
 
 ## Installation
 
@@ -46,7 +46,7 @@ config.get_default("not.existing", False)
 ```
 
 ## Updating Values
-Updates to the config can have a performance penalty, due to persistent_terms being optimized for reads over writes.  So it is preffered to update configs in batches.  This is done through passing a map to the config module.  Values in the map will override existing configuration values.
+Updates to the config can have a performance penalty, due to `persistent_term`s being optimized for reads over writes.  So it is preffered to update configs in batches.  This is done through passing a map to the config module.  Values in the map will override existing configuration values.
 
 ```gleam
 import gleam/map

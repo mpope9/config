@@ -1,5 +1,5 @@
 %% ----------------------------------
-%% @version 0.1.0
+%% @version 0.2.0
 %% @doc
 %% Base config server to interface with persistent_term storage.
 %% Parses a toml file defaulting to `config/config.toml`, or the
@@ -9,7 +9,7 @@
 %%
 %% Note, updating configs during runtime carries a heavy penalty.
 %% See persistent_term erlang documentation for more details.
-%% This server is useful for safe runtime puts, because
+%% This server is useful for safe(er) runtime puts, because
 %% persistent_term isn't optimized for writes.
 %%
 %% TODO: Move to Gleam based gen_server when that is implimented.
@@ -18,27 +18,33 @@
 
 -module(config_server).
 -compile({no_auto_import}).
--export([new/0, put/2, get/1, get/2]).
+-export([new/0, get_config/0, put_batch/1]).
 -export([start_link/0, init/1, handle_call/3, handle_cast/2, stop/0]).
 -behaviour(gen_server).
 
 -define(DEFAULT_CONFIG, "config/config.toml").
 -define(ENV_FILE, "GLEAM_CONFIG").
 
+-define(CONFIG_KEY, {?MODULE, config_map}).
+
 %% ----------------------------------
 %% Client api
 %% ----------------------------------
 
+%% ----------------------------------
 %% Parse the config.  On failure, return a
 %% Gleam binary error message.
+%% ----------------------------------
 -spec new() -> {error, binary()} | {ok, true}.
 
 new() ->
    ConfigFile = os:getenv(?ENV_FILE, ?DEFAULT_CONFIG),
-   case toml:read_file(ConfigFile) of
+   case tomerl:read_file(ConfigFile) of
       
       {ok, Config} ->
-         maps:fold(fun process_map/3, <<>>, Config),
+         {_, ConfigMap} = maps:fold(fun process_map/3, {<<>>, #{}}, Config),
+         io:format("~p~n", [ConfigMap]),
+         persistent_term:put(?CONFIG_KEY, ConfigMap),
          {ok, true};
 
       {error, {parse, LineNumber}} ->
@@ -51,22 +57,21 @@ new() ->
          {error, ErrorBinary}
    end.
 
--spec get(binary()) -> term().
+%% ----------------------------------
+%% Gets the entire config.
+%% ----------------------------------
+-spec get_config() -> map().
 
-get(Key) ->
-   PersistentKey = {?MODULE, Key},
-   persistent_term:get(PersistentKey).
+get_config() ->
+   persistent_term:get(?CONFIG_KEY).
 
--spec get(binary(), term()) -> term().
+%% ----------------------------------
+%% Replaces the current config with the passed map.
+%% ----------------------------------
+-spec put_batch(map()) -> term().
 
-get(Key, Default) ->
-   PersistentKey = {?MODULE, Key},
-   persistent_term:get(PersistentKey, Default).
-
--spec put(binary(), term()) -> term().
-
-put(Key, Value) ->
-   gen_server:call(?MODULE, {put, Key, Value}).
+put_batch(NewConfig) ->
+   gen_server:call(?MODULE, {put, NewConfig}).
 
 %% ----------------------------------
 %% gen_server api
@@ -82,10 +87,9 @@ start_link() ->
 init(Opt) ->
    {ok, Opt}.
 
-handle_call({put, Key, Value}, _From, State) ->
-   PersistentKey = {?MODULE, Key},
-   persistent_term:put(PersistentKey, Value),
-   {reply, Value, State}.
+handle_call({put, NewConfig}, _From, State) ->
+   persistent_term:put(?CONFIG_KEY, NewConfig),
+   {reply, true, State}.
 
 handle_cast(Cast, State) ->
    {stop, {bad_cast, Cast}, State}.
@@ -98,7 +102,7 @@ stop() ->
 %% ----------------------------------
 -spec process_map(binary(), term(), binary()) -> binary().
 
-process_map(CurrentKey, Value, PartialKey) ->
+process_map(CurrentKey, Value, {PartialKey, AccMap}) ->
 
    FullKey = <<PartialKey/binary, CurrentKey/binary>>,
    case is_map(Value) of
@@ -106,13 +110,12 @@ process_map(CurrentKey, Value, PartialKey) ->
       true ->
          Dot = <<".">>,
          ExtendedKey = <<FullKey/binary, Dot/binary>>,
-         maps:fold(fun process_map/3, ExtendedKey, Value),
-         PartialKey;
+         {_, NewAccMap} = maps:fold(fun process_map/3, {ExtendedKey, AccMap}, Value),
+         {PartialKey, NewAccMap};
          
       _ ->
-         Key = {?MODULE, FullKey},
-         persistent_term:put(Key, Value),
-         PartialKey
+         NewAccMap = maps:put(FullKey, Value, AccMap),
+         {PartialKey, NewAccMap}
    end.
 
 % EOF

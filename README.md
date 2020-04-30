@@ -2,11 +2,13 @@
 
 ![test](https://github.com/mpope9/config/workflows/test/badge.svg)
 
+#### TOC
+[Installation](##installation)
+[Example Usage](##example-usage)
+
 A Gleam configuration library.
 
 Relys on erlang's [persistent_terms](https://erlang.org/doc/man/persistent_term.html), so updating config values during runtime carries a heavy penalty (forces a GC on each process).
-
-Returns Dynamic types, as typing isn't known at the time of parsing the configuration files.
 
 ## Installation
 
@@ -33,12 +35,40 @@ import gleam/dynamic
 config.new()                    // Parses the config and stores it.
 config.start()                  // Starts the config server.
 config.get("test1.test2.test3") // Access.
-|> dynamic.bool
 |> expect.equal(_, Ok(True))
+
+config.get_default("not.existing", False)
+|> expect.equal(_, Ok(False))
+```
+
+## Updating Values
+Updates to the config can have a performance penalty, due to persistent_terms being optimized for reads over writes.  So it is preffered to update configs in batches.  This is done through passing a map to the config module.  Values in the map will override existing configuration values.
+
+```gleam
+import gleam/map
+
+let new_config = 
+   map.new
+   |> map.insert(_, "key1", "value1")
+   |> map.insert(_, "Ricky Booby", "Cal Naughton Jr.")
+
+config.put_batch(new_config)
+```
+
+To update a single value, the following api is provided, although its use is discouraged if multiple updates need to be made.  It will also override an existing value.
+````gleam
+config.put("key1", "value1")
+```
+
+## Get Entire Config
+Getting the whole configuration is supported.
+```gleam
+config.get_config()
 ```
 
 ## Keys
-Parses toml files and stores them.  An example:
+Parses toml files and stores them as strings.  At this time, only string key are supported.
+An example:
 
 ```toml
 [test1.test2]
@@ -58,8 +88,7 @@ To use a seperate config file, you can set the environment variable `GLEAM_CONFI
 ### TODO
 1. Ability to add to the Gleam supervision tree.
 2. Gleam gen_server implementation.
-3. Cleanup the Erlang toml library.
-4. Replace toml library with Gleam implementation (file read, etc.)
+3. Replace toml library with Gleam implementation (file read, etc.)
 
 ## Quick start
 

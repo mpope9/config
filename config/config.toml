@@ -5,3 +5,9 @@ count = 2
 
 [berry.black]
 has_some = true
+
+[test_int]
+value = 1
+
+[test_float]
+value = 2.2

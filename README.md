@@ -60,7 +60,7 @@ config.put_batch(new_config)
 ```
 
 To update a single value, the following api is provided, although its use is discouraged if multiple updates need to be made.  It will also override an existing value.
-````gleam
+```gleam
 config.put("key1", "value1")
 ```
 
